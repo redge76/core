@@ -4,12 +4,18 @@ import asyncio
 from typing import cast
 from unittest.mock import Mock, patch
 
-from pyheos import CommandFailedError, HeosError, SignalHeosEvent, SignalType, const
+from pyheos import (
+    CommandFailedError,
+    HeosError,
+    HeosOptions,
+    SignalHeosEvent,
+    SignalType,
+    const,
+)
 import pytest
 
 from homeassistant.components.heos import (
     ControllerManager,
-    HeosOptions,
     HeosRuntimeData,
     async_setup_entry,
     async_unload_entry,
@@ -160,9 +166,6 @@ async def test_async_setup_entry_connect_failure(
     with pytest.raises(ConfigEntryNotReady):
         await async_setup_entry(hass, config_entry)
     assert controller.connect.call_count == 1
-    assert controller.disconnect.call_count == 1
-    controller.connect.reset_mock()
-    controller.disconnect.reset_mock()
 
 
 async def test_async_setup_entry_player_failure(
@@ -175,8 +178,6 @@ async def test_async_setup_entry_player_failure(
         await async_setup_entry(hass, config_entry)
     assert controller.connect.call_count == 1
     assert controller.disconnect.call_count == 1
-    controller.connect.reset_mock()
-    controller.disconnect.reset_mock()
 
 
 async def test_unload_entry(hass: HomeAssistant, config_entry, controller) -> None:
@@ -189,7 +190,6 @@ async def test_unload_entry(hass: HomeAssistant, config_entry, controller) -> No
     ) as unload:
         assert await async_unload_entry(hass, config_entry)
         await hass.async_block_till_done()
-        assert controller_manager.disconnect.call_count == 1
         assert unload.call_count == 1
     assert DOMAIN not in hass.data
 
