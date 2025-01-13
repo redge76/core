@@ -18,7 +18,7 @@ from homeassistant.components.heos.const import (
     SERVICE_SIGN_IN,
     SERVICE_SIGN_OUT,
 )
-from homeassistant.config_entries import SOURCE_REAUTH, ConfigEntry, ConfigEntryState
+from homeassistant.config_entries import SOURCE_REAUTH, ConfigEntryState
 from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_USERNAME
 from homeassistant.core import HomeAssistant
 from homeassistant.setup import async_setup_component
@@ -27,7 +27,7 @@ from tests.common import MockConfigEntry
 
 
 async def test_async_setup_returns_true(
-    hass: HomeAssistant, config_entry: ConfigEntry
+    hass: HomeAssistant, config_entry: MockConfigEntry
 ) -> None:
     """Test component setup and services registered."""
     config_entry.add_to_hass(hass)
@@ -37,7 +37,7 @@ async def test_async_setup_returns_true(
 
 
 async def test_async_setup_entry_and_async_unload_entry(
-    hass: HomeAssistant, config_entry: ConfigEntry, controller: Heos
+    hass: HomeAssistant, config_entry: MockConfigEntry, controller: Heos
 ) -> None:
     """Test load and unload of the config entry."""
     # Load
@@ -58,7 +58,7 @@ async def test_async_setup_entry_and_async_unload_entry(
 
 async def test_async_setup_entry_with_options_loads_platforms(
     hass: HomeAssistant,
-    config_entry_options: ConfigEntry,
+    config_entry_options: MockConfigEntry,
     controller: Heos,
 ) -> None:
     """Test load connects to heos with options, retrieves players, and loads platforms."""
@@ -108,7 +108,7 @@ async def test_async_setup_entry_auth_failure_starts_reauth(
 
 async def test_async_setup_entry_not_signed_in_loads_platforms(
     hass: HomeAssistant,
-    config_entry: ConfigEntry,
+    config_entry: MockConfigEntry,
     controller: Heos,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
@@ -129,7 +129,7 @@ async def test_async_setup_entry_not_signed_in_loads_platforms(
 
 
 async def test_async_setup_entry_connect_failure(
-    hass: HomeAssistant, config_entry: ConfigEntry, controller: Heos
+    hass: HomeAssistant, config_entry: MockConfigEntry, controller: Heos
 ) -> None:
     """Connection failure raises ConfigEntryNotReady."""
     controller.connect.side_effect = HeosError()
@@ -140,7 +140,7 @@ async def test_async_setup_entry_connect_failure(
 
 
 async def test_async_setup_entry_player_failure(
-    hass: HomeAssistant, config_entry: ConfigEntry, controller: Heos
+    hass: HomeAssistant, config_entry: MockConfigEntry, controller: Heos
 ) -> None:
     """Failure to retrieve players/sources raises ConfigEntryNotReady."""
     controller.get_players.side_effect = HeosError()
@@ -153,7 +153,7 @@ async def test_async_setup_entry_player_failure(
 
 async def test_update_sources_retry(
     hass: HomeAssistant,
-    config_entry: ConfigEntry,
+    config_entry: MockConfigEntry,
     controller: Heos,
     caplog: pytest.LogCaptureFixture,
 ) -> None:
