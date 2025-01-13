@@ -184,7 +184,7 @@ class HeosFlowHandler(ConfigFlow, domain=DOMAIN):
         errors: dict[str, str] = {}
         entry = self._get_reauth_entry()
         if user_input is not None:
-            heos = cast(Heos, entry.runtime_data.controller_manager.controller)
+            heos = cast(Heos, entry.runtime_data.coordinator.heos)
             if await _validate_auth(user_input, heos, errors):
                 return self.async_update_reload_and_abort(entry, options=user_input)
 
@@ -206,9 +206,7 @@ class HeosOptionsFlowHandler(OptionsFlow):
         """Manage the options."""
         errors: dict[str, str] = {}
         if user_input is not None:
-            heos = cast(
-                Heos, self.config_entry.runtime_data.controller_manager.controller
-            )
+            heos = cast(Heos, self.config_entry.runtime_data.coordinator.heos)
             if await _validate_auth(user_input, heos, errors):
                 return self.async_create_entry(data=user_input)
 
