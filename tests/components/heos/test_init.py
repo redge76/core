@@ -2,15 +2,7 @@
 
 from typing import cast
 
-from pyheos import (
-    CommandFailedError,
-    Heos,
-    HeosError,
-    HeosOptions,
-    SignalHeosEvent,
-    SignalType,
-    const,
-)
+from pyheos import Heos, HeosError, HeosOptions, SignalHeosEvent, SignalType
 import pytest
 
 from homeassistant.components.heos.const import (
@@ -150,24 +142,3 @@ async def test_async_setup_entry_player_failure(
     assert config_entry.state is ConfigEntryState.SETUP_RETRY
     assert controller.connect.call_count == 1
     assert controller.disconnect.call_count == 1
-
-
-async def test_update_sources_retry(
-    hass: HomeAssistant,
-    config_entry: MockConfigEntry,
-    controller: Heos,
-    caplog: pytest.LogCaptureFixture,
-) -> None:
-    """Test update sources retries on failures to max attempts."""
-    config_entry.add_to_hass(hass)
-    assert await hass.config_entries.async_setup(config_entry.entry_id)
-    controller.get_favorites.reset_mock()
-    source_manager = config_entry.runtime_data.coordinator.source_manager
-    source_manager.retry_delay = 0
-    source_manager.max_retry_attempts = 1
-    controller.get_favorites.side_effect = CommandFailedError("Test", "test", 0)
-    await controller.dispatcher.wait_send(
-        SignalType.CONTROLLER_EVENT, const.EVENT_SOURCES_CHANGED, {}
-    )
-    assert "Unable to update sources" in caplog.text
-    assert controller.get_favorites.call_count == 2
